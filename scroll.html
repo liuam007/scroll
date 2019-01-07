@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+        }
+
+        .wrapper {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 10%;
+            height: 100%;
+            background: #fff;
+            border-right: 1px solid #ccc;
+        }
+
+        .box1 {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 90%;
+            height: 100%;
+            background: #eee;
+            overflow-y: auto;
+        }
+
+        .section {
+            font-size: 15px;
+            color: #333;
+            width: 100%;
+            height: 60px;
+            line-height: 60px;
+            text-align: center;
+            cursor: pointer;
+            background: #fff;
+            /* border-right: 1px solid #ccc; */
+            transition: all .5s;
+        }
+
+        .section:hover {
+            color: #04be02;
+            background: #eee;
+        }
+
+        .list {
+            width: 100%;
+            height: 500px;
+        }
+
+        .tit {
+            margin: 5px 0;
+            padding: 0;
+            width: 100%;
+            height: 50px;
+            line-height: 50px;
+            padding-left: 10px;
+            font-size: 15px;
+            background: #feefdf;
+            color: #333;
+        }
+
+        .active {
+            color: #04be02;
+            background: #eee;
+            /* border-right:1px solid #eee; */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <div class="section">分类1</div>
+            <div class="section">分类2</div>
+            <div class="section">分类3</div>
+            <div class="section">分类4</div>
+        </div>
+        <div class="box1">
+            <div class="list">
+                <p class="tit">分类1</p>
+                <div class="list_cont">
+                    内容
+                </div>
+            </div>
+
+            <div class="list">
+                <p class="tit">分类2</p>
+                <div class="list_cont">
+                    内容
+                </div>
+            </div>
+
+            <div class="list">
+                <p class="tit">分类3</p>
+                <div class="list_cont">
+                    内容
+                </div>
+            </div>
+
+            <div class="list">
+                <p class="tit">分类4</p>
+                <div class="list_cont">
+                    内容
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    let $ = (obj) => {
+        if (typeof (obj) != 'number') {
+            if (obj.indexOf('#') != -1) {
+                return document.querySelector(obj);
+            } else if (obj.indexOf('.') != -1) {
+                let dom = document.querySelectorAll(obj);
+                let len = dom.length;
+                if (len === 1 && len) {
+                    return dom[0];
+                } else {
+                    return dom;
+                };
+            } else {
+                console.log(new Error('请检查是否存在该id或class'));
+                return undefined;
+            };
+        } else {
+            console.log(new Error('请传入id或class'));
+            return undefined;
+        };
+    };
+
+
+    scrolls(['.box1', '.section', '.list', 200, 'section', 'active', 2]);
+
+    function scrolls(obj) {
+        $(obj[0]).onscroll = function () {
+            var t = this.scrollTop; //获取滚动条距离顶部的位置
+            var len = $(obj[2]).length; //获取nav个数
+            for (var i = 0; i < len; i++) {
+                if (t >= $(obj[2])[i].offsetTop - obj[3]) {
+                    // 判断顶部距离大于等于当前div的上边距
+                    if (t < (to_scroll(i, true)) + obj[3] || t > (to_scroll(i, true)) + obj[3]) {
+                        // 判断顶部距离小于div的高度乘于当前div的下标
+                        for (var k = 0; k < len; k++) {
+                            $(obj[1])[k].className = obj[4];
+                            // 恢复初始值
+                        };
+                        $(obj[1])[i].classList.add(obj[5]);
+                        // 添加样式
+                    };
+                };
+            };
+        }; //滚动实时监听滚动条位置
+
+        (function () {
+            var len = $(obj[1]).length;
+            for (var i = 0; i < len; i++) {
+                $(obj[1])[i].className = obj[4];
+                nav_tab(i);
+            };
+
+            function nav_tab(i) {
+                $(obj[1])[i].addEventListener('click', function () {
+                    to_scroll(i);
+                    for (var j = 0; j < len; j++) {
+                        $(obj[1])[j].className = obj[4]; // 恢复初始值
+                    };
+                    this.classList.add(obj[5]); // 添加样式
+                }, false);
+            };
+            // 点击侧边改变滚动条位置
+        })();
+
+        (function () {
+            var index = obj[6] || 0;
+            if (index) {
+                if (!(index - 1)) {
+                    $(obj[0]).scrollTop = 1;
+                    // 避免设置第一个默认显示的时候不会自动选中
+                } else {
+                    to_scroll(index - 1);
+                };
+            } else {
+                $(obj[0]).scrollTop = 1;
+            };
+        })(); // 初始显示
+
+        function to_scroll(i, flag) {
+            var num = 0;
+            for (var l = 0; l < i; l++) {
+                num += $(obj[2])[l].offsetHeight;
+            };
+            if (!flag) {
+                $(obj[0]).scrollTop = num; //设置滚动条
+            } else {
+                return num; //返回滚动条的位置
+            };
+        }; //设置滚动条位置(滚动条的位置是obj[2]的下标（第几个）之间的总和)
+    };
+</script>
+
+</html>
